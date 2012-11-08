@@ -88,4 +88,4 @@ pomodoro.widget:buttons(awful.util.table.join(
 	height			Height of widget
 
 ###Note
-If you prefer indivisible sessions (no ability to pause) instead of pomodoro.toggle use pomodoro.begin and override mouse button 1 something else but toggle/pause.
+If you prefer indivisible sessions (no ability to pause) then instead of pomodoro.toggle use pomodoro.begin and override mouse button 1 to something else but toggle/pause.
