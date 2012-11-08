@@ -3,8 +3,8 @@
 local awful     = require("awful")
 local naughty   = require("naughty")
 local math      = require("math")
-local string	= require("string")
-local timer 	= timer
+local string		= require("string")
+local timer			= timer
 
 module("awmodoro")
 
@@ -25,12 +25,14 @@ function new(args)
     if args.begin_callback then pomodoro.begin_callback = args.begin_callback end
 
     pomodoro.begin = function ()
-    	if pomodoro.begin_callback then pomodoro.begin_callback() end
-		pomodoro.elapsed = 0
-		pomodoro.refresh()
-    	pomodoro.progressbar:set_background_color(active_bg_color)
-		pomodoro.timer:start()
-		if do_notify then naughty.notify({text = "Begin"}) end
+    	if not pomodoro.timer.started then 
+	    	if pomodoro.begin_callback then pomodoro.begin_callback() end
+			pomodoro.elapsed = 0
+			pomodoro.refresh()
+	    	pomodoro.progressbar:set_background_color(active_bg_color)
+			pomodoro.timer:start()
+			if do_notify then naughty.notify({text = "Begin"}) end
+		end
 	end
 
 	pomodoro.pause = function ()
