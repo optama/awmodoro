@@ -16,7 +16,7 @@ function new(args)
     local pause_bg_color = args.pause_bg_color or '#FF732F'
     local normal_bg_color = args.normal_bg_color or '#494B4F'
     local gradient_colors = args.gradient_colors or { '#AECF96', '#88A175', '#FF5656' }
-    local seconds = args.seconds or 60*25
+    local seconds = (args.minutes and args.minutes * 60) or 25*60
     local do_notify = args.do_notify or false
 
     local pomodoro = {seconds = seconds, elapsed = 0, timer = timer({ timeout = 1 })}
