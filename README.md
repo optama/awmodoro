@@ -1,4 +1,5 @@
-#Pomodoro for Awesome WM
+#Awmodoro
+###Clutter-free Pomodoro sessions in Awesome WM
 Awmodoro is in itself a very simple timer (with a progress bar ui) specifically made with regards to the "Pomodoro Technique".
 It can be used as a regular widget, however - awmodoro provides the user with hooks allowing lua-code to be executed at start and end of each session. This allows for setup and teardown of distraction free environments.
 
@@ -85,3 +86,6 @@ pomodoro.widget:buttons(awful.util.table.join(
 	do_notify		Boolean value specifying wether notifications (using naughty) should be shown. Notifications shown are; begin, 					pause, resume, finish and reset
 	width			Width of widget
 	height			Height of widget
+
+###Note
+If you prefer indivisible sessions (no ability to pause) instead of pomodoro.toggle use pomodoro.begin and override mouse button 1 something else but toggle/pause.
