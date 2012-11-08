@@ -13,8 +13,8 @@ function new(args)
     
     local width = args.width or 20
     local height = args.height or 100
-    local pause_bg_color = args.pause_bg_color or '#FF732F'
-    local normal_bg_color = args.normal_bg_color or '#494B4F'
+    local paused_bg_color = args.paused_bg_color or '#FF732F'
+    local active_bg_color = args.active_bg_color or '#494B4F'
     local gradient_colors = args.gradient_colors or { '#AECF96', '#88A175', '#FF5656' }
     local seconds = (args.minutes and args.minutes * 60) or 25*60
     local do_notify = args.do_notify or false
@@ -28,19 +28,19 @@ function new(args)
     	if pomodoro.begin_callback then pomodoro.begin_callback() end
 		pomodoro.elapsed = 0
 		pomodoro.refresh()
-    	pomodoro.progressbar:set_background_color(normal_bg_color)
+    	pomodoro.progressbar:set_background_color(active_bg_color)
 		pomodoro.timer:start()
 		if do_notify then naughty.notify({text = "Begin"}) end
 	end
 
 	pomodoro.pause = function ()
 		pomodoro.timer:stop()
-		pomodoro.progressbar:set_background_color(pause_bg_color)
+		pomodoro.progressbar:set_background_color(paused_bg_color)
 		if do_notify then naughty.notify({text = "Paused"}) end
 	end
 
 	pomodoro.resume = function ()
-		pomodoro.progressbar:set_background_color(normal_bg_color)
+		pomodoro.progressbar:set_background_color(active_bg_color)
 		pomodoro.timer:start()
 		if do_notify then naughty.notify({text = "Resume"}) end
 	end
@@ -87,7 +87,7 @@ function new(args)
 	pomodoro.progressbar:set_height(height)
 	pomodoro.progressbar:set_vertical(false)
 	pomodoro.progressbar:set_max_value(seconds)
-	pomodoro.progressbar:set_background_color(normal_bg_color)
+	pomodoro.progressbar:set_background_color(active_bg_color)
 	if args.gradient_colors then 
 		pomodoro.progressbar:set_gradient_colors(args.gradient_colors)
 	elseif args.color then
