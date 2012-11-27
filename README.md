@@ -1,14 +1,14 @@
 #Awmodoro
 ###Clutter-free Pomodoro sessions in Awesome WM
-Awmodoro is in itself a very simple timer (with a progress bar ui) specifically made with regards to the "Pomodoro Technique".
-It can be used as a regular widget, however - awmodoro provides the user with hooks allowing lua-code to be executed at start and end of each session. This allows for setup and teardown of distraction free environments.
-
-The basic idea is to at start
+The basic idea is to at start (with for instance a keybinding)
 * hide clutter (widgets/wibox)
 * show a very out-of-our-way and subtle indication of elapsed and left time
 
 and at stop
 * bring back user to the real world
+
+Awmodoro is in itself a very simple timer (with a progress bar ui) specifically made with regards to the "Pomodoro Technique".
+It can be used as a regular widget, however - awmodoro provides the user with hooks allowing lua-code to be executed at start and end of each session. This allows for setup and teardown of distraction free environments.
 
 
 ##Usage
