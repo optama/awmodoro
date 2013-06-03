@@ -3,122 +3,166 @@
 local awful     = require("awful")
 local naughty   = require("naughty")
 local math      = require("math")
-local string		= require("string")
-local timer			= timer
+local string	= require("string")
+local timer		= timer
+local gears 	= require("gears")
 
-module("awmodoro")
+local setmetatable = setmetatable
+local ipairs = ipairs
+local base = require("wibox.widget.base")
+local cairo = require("lgi").cairo
 
-function new(args)
-    local args = args or {}
-    
-    local width = args.width or 20
-    local height = args.height or 100
-    local paused_bg_color = args.paused_bg_color or '#FF732F'
-    local active_bg_color = args.active_bg_color or '#494B4F'
-    local gradient_colors = args.gradient_colors or { '#AECF96', '#88A175', '#FF5656' }
-    local seconds = (args.minutes and args.minutes * 60) or 25*60
-    local do_notify = args.do_notify or false
+--module("awmodoro")
 
-    local pomodoro = {seconds = seconds, elapsed = 0, timer = timer({ timeout = 1 })}
 
-    if args.finish_callback then pomodoro.finish_callback = args.finish_callback end
-    if args.begin_callback then pomodoro.begin_callback = args.begin_callback end
 
-    pomodoro.begin = function ()
-    	if not pomodoro.timer.started then 
-	    	if pomodoro.begin_callback then pomodoro.begin_callback() end
-			pomodoro.elapsed = 0
-			pomodoro.refresh()
-	    	pomodoro.progressbar:set_background_color(active_bg_color)
-			pomodoro.timer:start()
-			if do_notify then naughty.notify({text = "Begin"}) end
+local awmodoro = { mt = {} }
+local data = setmetatable({}, { __mode = "k" })
+
+local properties = { "width", "height", "paused_bg_color", "active_bg_color", "fg_color", "seconds", "do_notify"}
+
+local function update(_awmodoro)
+	data[_awmodoro].bar:set_value(data[_awmodoro].elapsed)
+	_awmodoro:emit_signal("widget::updated")
+end
+
+function awmodoro.draw(_awmodoro, wibox, cr, width, height)
+	data[_awmodoro].bar:draw(wibox, cr, width, height)
+end
+
+function awmodoro.fit(_awmodoro, width, height)
+	return data[_awmodoro].width, data[_awmodoro].height
+end
+
+function awmodoro:begin()
+	if not data[self].timer.started then 
+		if data[self].begin_callback then data[self].begin_callback() end
+		data[self].elapsed = 0
+		data[self].bar:set_background_color(data[self].active_bg_color)
+		update(self)
+		data[self].timer:start()
+		print("notify")
+		if data[self].do_notify then naughty.notify({text = "Begin"}) end
+	end
+end
+
+function awmodoro:pause()
+	data[self].timer:stop()
+	data[self].bar:set_background_color(data[self].paused_bg_color)
+	update(self)
+	if do_notify then naughty.notify({text = "Paused"}) end
+end
+
+function awmodoro:resume()
+	data[self].bar:set_background_color(data[self].active_bg_color)
+	update(self)
+	data[self].timer:start()
+	if do_notify then naughty.notify({text = "Resume"}) end
+end
+
+function awmodoro:finish()
+	data[self].timer:stop()
+	data[self].elapsed = data[self].seconds
+	update(self)
+	if do_notify then naughty.notify({text = "Finished"}) end
+	if data[self].finish_callback then data[self].finish_callback() end
+end
+
+function awmodoro:reset()
+	data[self].elapsed = 0
+	update(self)
+	if do_notify then naughty.notify({text = "Reset"}) end
+end
+
+function awmodoro:toggle()
+	if data[self].timer.started then
+		self:pause()
+	elseif data[self].elapsed == 0 or data[self].elapsed == data[self].seconds then
+		self:begin()
+	else
+		self:resume()
+	end
+end
+
+for _, prop in ipairs(properties) do
+	if not awmodoro["set_" .. prop] then
+		awmodoro["set_" .. prop] = function(_awmodoro, value)
+			data[_awmodoro][prop] = value
+			_awmodoro:emit_signal("widget::updated")
+			return _awmodoro
 		end
 	end
+end
 
-	pomodoro.pause = function ()
-		pomodoro.timer:stop()
-		pomodoro.progressbar:set_background_color(paused_bg_color)
-		if do_notify then naughty.notify({text = "Paused"}) end
-	end
+function awmodoro.new(args)
+	local args = args or {}
 
-	pomodoro.resume = function ()
-		pomodoro.progressbar:set_background_color(active_bg_color)
-		pomodoro.timer:start()
-		if do_notify then naughty.notify({text = "Resume"}) end
-	end
+	local width = args.width or 20
+	local height = args.height or 100
+	local paused_bg_color = args.paused_bg_color or '#FF732F'
+	local active_bg_color = args.active_bg_color or '#494B4F'
+	local seconds = (args.minutes and args.minutes * 60) or 25*60
+	
+	local fg_color = args.fg_color or {type = "linear", from = {0,0}, to = {width, 0}, stops = {{0, "#AECF96"},{0.5, "#88A175"},{1, "#FF5656"}}}
+	local do_notify = args.do_notify or false
 
-	pomodoro.finish = function ()
-		pomodoro.timer:stop()
-		pomodoro.elapsed = pomodoro.seconds
-		pomodoro.refresh()
-		if do_notify then naughty.notify({text = "Finished"}) end
-		if pomodoro.finish_callback then pomodoro.finish_callback() end
-	end
+	local _awmodoro = base.make_widget()
 
-	pomodoro.reset = function ()
-		pomodoro.elapsed = 0
-		pomodoro.refresh()
-		if do_notify then naughty.notify({text = "Reset"}) end
-	end
+	local bar = awful.widget.progressbar.new({width = width, height = height})
 
-	pomodoro.toggle = function ()
-		if pomodoro.timer.started then
-			pomodoro.pause()
-		elseif pomodoro.elapsed == 0 or pomodoro.elapsed == pomodoro.seconds then
-			pomodoro.begin()
-		else
-			pomodoro.resume()
-		end
-	end
+	data[_awmodoro] = { width = width, height = height, seconds = seconds, elapsed = 0, timer = timer({ timeout = 1 }), bar = bar, active_bg_color = active_bg_color, paused_bg_color = paused_bg_color}
 
-	pomodoro.refresh = function ()
-		pomodoro.progressbar:set_value(pomodoro.elapsed)
-	end
+	if args.finish_callback then data[_awmodoro].finish_callback = args.finish_callback end
+	if args.begin_callback then data[_awmodoro].begin_callback = args.begin_callback end
 
-	pomodoro.timer:add_signal("timeout", function(c)
-		pomodoro.elapsed = pomodoro.elapsed + 1
-		pomodoro.refresh()
-		if pomodoro.elapsed >= pomodoro.seconds then
-			pomodoro.finish()
+	_awmodoro.draw = awmodoro.draw
+	_awmodoro.fit = awmodoro.fit
+	_awmodoro.toggle = awmodoro.toggle
+	_awmodoro.begin = awmodoro.begin
+	_awmodoro.pause = awmodoro.pause
+	_awmodoro.resume = awmodoro.resume
+	_awmodoro.finish = awmodoro.finish
+	_awmodoro.reset = awmodoro.reset
+
+	data[_awmodoro].timer:connect_signal("timeout", function(c)
+		data[_awmodoro].elapsed = data[_awmodoro].elapsed + 1
+		update(_awmodoro)
+		if data[_awmodoro].elapsed >= data[_awmodoro].seconds then
+			_awmodoro:finish()
 		end
 	end)
 
-	pomodoro.progressbar = awful.widget.progressbar.new()
-
-	pomodoro.progressbar:set_width(width)
-	pomodoro.progressbar:set_height(height)
-	pomodoro.progressbar:set_vertical(false)
-	pomodoro.progressbar:set_max_value(seconds)
-	pomodoro.progressbar:set_background_color(active_bg_color)
-	if args.gradient_colors then 
-		pomodoro.progressbar:set_gradient_colors(args.gradient_colors)
-	elseif args.color then
-		pomodoro.progressbar:set_color(args.color)
-	else 
-		pomodoro.progressbar:set_gradient_colors(gradient_colors)
-	end
+	bar:set_width(width)
+	bar:set_height(height)
+	bar:set_vertical(false)
+	bar:set_max_value(seconds)
+	bar:set_background_color(active_bg_color)
+	bar:set_color(fg_color)
 	
-	pomodoro.widget = pomodoro.progressbar.widget
-
-	pomodoro.widget:buttons(awful.util.table.join(
-		awful.button({ }, 1, pomodoro.toggle),
-		awful.button({ }, 2, pomodoro.finish),
-		awful.button({ }, 3, pomodoro.reset)
-	))
+	_awmodoro:buttons(awful.util.table.join(
+		awful.button({ }, 1, function() _awmodoro:toggle() end),
+		awful.button({ }, 2, function() _awmodoro:finish() end),
+		awful.button({ }, 3, function() _awmodoro:reset() end)
+		))
 
 	local pomodoro_tooltip = awful.tooltip({
-		objects = { pomodoro.widget },
+		objects = { _awmodoro },
 		timer_function = function()
-			local elapsed = pomodoro.elapsed
-			local left = pomodoro.seconds - pomodoro.elapsed
+			local elapsed = data[_awmodoro].elapsed
+			local left = data[_awmodoro].seconds - data[_awmodoro].elapsed
 
 			local tip = string.format("%-7s\t%02d:%02d\n%-7s\t%02d:%02d", "Elapsed", math.floor(elapsed / 60), elapsed % 60, "Left", math.floor(left/60), left%60)
-			if not pomodoro.timer.started then
+			if not data[_awmodoro].timer.started then
 				tip = tip .. "\nNot running"
 			end
 			return tip
-		end,
-	})
+		end})
 
-    return pomodoro
+	return _awmodoro
 end
+
+function awmodoro.mt:__call(...)
+	return awmodoro.new(...)
+end
+
+return setmetatable(awmodoro, awmodoro.mt)
