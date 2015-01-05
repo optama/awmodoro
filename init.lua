@@ -41,8 +41,7 @@ function awmodoro:begin()
 		data[self].bar:set_background_color(data[self].active_bg_color)
 		update(self)
 		data[self].timer:start()
-		print("notify")
-		if data[self].do_notify then naughty.notify({text = "Begin"}) end
+		if data[self].do_notify then naughty.notify({text = "Pomodoro Begin"}) end
 	end
 end
 
@@ -50,28 +49,28 @@ function awmodoro:pause()
 	data[self].timer:stop()
 	data[self].bar:set_background_color(data[self].paused_bg_color)
 	update(self)
-	if do_notify then naughty.notify({text = "Paused"}) end
+    if data[self].do_notify then naughty.notify({text = "Pomodoro Paused"}) end
 end
 
 function awmodoro:resume()
 	data[self].bar:set_background_color(data[self].active_bg_color)
 	update(self)
 	data[self].timer:start()
-	if do_notify then naughty.notify({text = "Resume"}) end
+    if data[self].do_notify then naughty.notify({text = "Pomodoro Resumed"}) end
 end
 
 function awmodoro:finish()
 	data[self].timer:stop()
 	data[self].elapsed = data[self].seconds
 	update(self)
-	if do_notify then naughty.notify({text = "Finished"}) end
+    if data[self].do_notify then naughty.notify({text = "Pomodoro Finished"}) end
 	if data[self].finish_callback then data[self].finish_callback() end
 end
 
 function awmodoro:reset()
 	data[self].elapsed = 0
 	update(self)
-	if do_notify then naughty.notify({text = "Reset"}) end
+    if data[self].do_notify then naughty.notify({text = "Pomodoro Reset"}) end
 end
 
 function awmodoro:toggle()
@@ -110,7 +109,7 @@ function awmodoro.new(args)
 
 	local bar = awful.widget.progressbar.new({width = width, height = height})
 
-	data[_awmodoro] = { width = width, height = height, seconds = seconds, elapsed = 0, timer = timer({ timeout = 1 }), bar = bar, active_bg_color = active_bg_color, paused_bg_color = paused_bg_color}
+	data[_awmodoro] = { width = width, height = height, seconds = seconds, elapsed = 0, timer = timer({ timeout = 1 }), bar = bar, active_bg_color = active_bg_color, paused_bg_color = paused_bg_color, do_notify = do_notify}
 
 	if args.finish_callback then data[_awmodoro].finish_callback = args.finish_callback end
 	if args.begin_callback then data[_awmodoro].begin_callback = args.begin_callback end
