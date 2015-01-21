@@ -72,13 +72,13 @@ pomodoro:buttons(awful.util.table.join(
 ))
 ```
 ##Widget parameters
-	minutes			Minutes defining duration of a session
-	active_bg_color	Background color of progress bar when timer is running
-	paused_bg_color	Background color of progress bar when timer is paused
-	fg_color		Foreground color(s) of progress bar
-	do_notify		Boolean value specifying wether notifications (using naughty) should be shown. Notifications shown are; begin, pause, resume, finish and reset
-	width			Width of widget
-	height			Height of widget
+	minutes			Minutes defining duration of a session.
+	active_bg_color	Background color of progress bar when timer is running.
+	paused_bg_color	Background color of progress bar when timer is paused.
+	fg_color		Foreground color(s) of progress bar.
+	do_notify		Boolean value specifying wether notifications should be shown at begin, pause, resume, finish and reset.
+	width			Width of widget.
+	height			Height of widget.
 
 Colors are provided according to format specified by http://awesome.naquadah.org/doc/api/modules/gears.color.html
 
