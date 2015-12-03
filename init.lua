@@ -63,7 +63,7 @@ end
 function awmodoro:finish()
 	data[self].timer:stop()
 	data[self].elapsed = data[self].seconds
-	awful.util.spawn("aplay	" .. wmodoro_bell_path)
+	awful.util.spawn("aplay	" .. awmodoro_bell_path)
 	update(self)
     if data[self].do_notify then naughty.notify({text = "Pomodoro Finished"}) end
 	if data[self].finish_callback then data[self].finish_callback() end
