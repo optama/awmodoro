@@ -4,8 +4,8 @@ local awful     = require("awful")
 local naughty   = require("naughty")
 local math      = require("math")
 local string	= require("string")
-local timer		= timer
 local gears 	= require("gears")
+local wibox 	= require("wibox")
 
 local setmetatable = setmetatable
 local ipairs = ipairs
@@ -107,9 +107,9 @@ function awmodoro.new(args)
 
 	local _awmodoro = base.make_widget()
 
-	local bar = awful.widget.progressbar.new({width = width, height = height})
+	local bar = wibox.widget.progressbar.new({width = width, height = height})
 
-	data[_awmodoro] = { width = width, height = height, seconds = seconds, elapsed = 0, timer = timer({ timeout = 1 }), bar = bar, active_bg_color = active_bg_color, paused_bg_color = paused_bg_color, do_notify = do_notify}
+	data[_awmodoro] = { width = width, height = height, seconds = seconds, elapsed = 0, timer = gears.timer { timeout = 1 }, bar = bar, active_bg_color = active_bg_color, paused_bg_color = paused_bg_color, do_notify = do_notify}
 
 	if args.finish_callback then data[_awmodoro].finish_callback = args.finish_callback end
 	if args.begin_callback then data[_awmodoro].begin_callback = args.begin_callback end
@@ -131,9 +131,8 @@ function awmodoro.new(args)
 		end
 	end)
 
-	bar:set_width(width)
-	bar:set_height(height)
-	bar:set_vertical(false)
+	bar.forced_width = width
+	bar.forced_height = height
 	bar:set_max_value(seconds)
 	bar:set_background_color(active_bg_color)
 	bar:set_color(fg_color)
