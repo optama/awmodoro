@@ -82,7 +82,7 @@ pomodoro:buttons(awful.util.table.join(
 
 Colors are provided according to format specified by http://awesome.naquadah.org/doc/api/modules/gears.color.html
 
-## Sound notification
+##Sound notification
 
 If you wish to be notified by sound when a Pomodoro ends, you may add this functionality to `finish_callback`. E.g.
 
