@@ -87,13 +87,13 @@ Colors are provided according to format specified by http://awesome.naquadah.org
 If you wish to be notified by sound when a Pomodoro ends, you may add this functionality to `finish_callback`.
 
 1. Make sure you have a sound player, e.g. [aplay](http://linux.die.net/man/1/aplay)
-2. Download a [bell sound](http://freesound.org/people/CJ4096/sounds/66717/) into awmodoro's directory
+2. Download a [bell sound] and put it somewhere accessible to awesome.
 3. Modify init.lua and add a call to **finish_callback**
 
 E.g.
 ```lua
 	finish_callback = function()
-		awful.util.spawn("aplay	" .. awful.util.getdir("config") .. "/awmodoro/bell.wav")
+		awful.util.spawn("aplay	/home/foo/sounds/bell.wav")
 		for s = 1, screen.count() do
 			mywibox[s].visible = true
 		end
