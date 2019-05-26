@@ -82,5 +82,23 @@ pomodoro:buttons(awful.util.table.join(
 
 Colors are provided according to format specified by http://awesome.naquadah.org/doc/api/modules/gears.color.html
 
+## Sound notification
+
+If you wish to be notified by sound when a Pomodoro ends, you may add this functionality to `finish_callback`. E.g.
+
+1. Make sure you have [aplay](http://linux.die.net/man/1/aplay)
+2. Download a [bell sound](http://freesound.org/people/CJ4096/sounds/66717/) into awmodoro's directory
+3. Modify init.lua as following:
+
+```lua
+	finish_callback = function()
+		awful.util.spawn("aplay	" .. awful.util.getdir("config") .. "/awmodoro/bell.wav")
+		for s = 1, screen.count() do
+			mywibox[s].visible = true
+		end
+		pomowibox.visible = false
+	end})
+```
+
 ###Note
 If you prefer indivisible sessions (no ability to pause) then instead of pomodoro:toggle() use pomodoro:begin() and override mouse button 1 to something else but toggle/pause.
