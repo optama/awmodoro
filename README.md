@@ -1,5 +1,5 @@
-#Awmodoro
-###Clutter-free Pomodoro sessions in Awesome WM
+# Awmodoro
+### Clutter-free Pomodoro sessions in Awesome WM
 The basic idea is to at start (with for instance a keybinding)
 * hide clutter (widgets/wibox)
 * show a very out-of-our-way and subtle indication of elapsed and left time
@@ -11,7 +11,7 @@ Awmodoro is in itself a very simple timer (with a progress bar ui) specifically 
 It can be used as a regular widget, however - awmodoro provides the user with hooks allowing lua-code to be executed at start and end of each session. This allows for setup and teardown of distraction free environments.
 
 
-##Usage
+## Usage
 	cd ~/.config/awesome
 	git clone git://github.com/optama/awmodoro.git
 
@@ -71,7 +71,7 @@ pomodoro:buttons(awful.util.table.join(
 	awful.button({ }, 3, function() pomodoro:reset() end)
 ))
 ```
-##Widget parameters
+## Widget parameters
 	minutes			Minutes defining duration of a session.
 	active_bg_color	Background color of progress bar when timer is running.
 	paused_bg_color	Background color of progress bar when timer is paused.
@@ -82,7 +82,7 @@ pomodoro:buttons(awful.util.table.join(
 
 Colors are provided according to format specified by http://awesome.naquadah.org/doc/api/modules/gears.color.html
 
-##Sound notification
+## Sound notification
 
 If you wish to be notified by sound when a Pomodoro ends, you may add this functionality to `finish_callback`. E.g.
 
@@ -100,5 +100,5 @@ If you wish to be notified by sound when a Pomodoro ends, you may add this funct
 	end})
 ```
 
-###Note
+### Note
 If you prefer indivisible sessions (no ability to pause) then instead of pomodoro:toggle() use pomodoro:begin() and override mouse button 1 to something else but toggle/pause.
